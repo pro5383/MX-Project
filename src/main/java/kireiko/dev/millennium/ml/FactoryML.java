@@ -52,8 +52,12 @@ public class FactoryML {
             RNNModelML m = new RNNModelML(16, 48);
             if (file.exists()) {
                 try (InputStream in = Files.newInputStream(file.toPath())) {
-                    m.load(in);
-                    Logger.info("Model loaded: " + name);
+                    if (m.load(in)) {
+                        Logger.info("Model loaded: " + name);
+                    } else {
+                        Logger.error("Bad v5 model file, overwriting with fresh weights.");
+                        m.saveToFile(file.getAbsolutePath());
+                    }
                 } catch (Exception e) {
                     Logger.error("Bad v5 model file, overwriting with fresh weights.");
                     m.saveToFile(file.getAbsolutePath());
@@ -91,10 +95,12 @@ public class FactoryML {
             if (is != null) {
                 if (ver == ModelVer.VERSION_5) {
                     RNNModelML m = new RNNModelML(16, 48);
-                    m.load(is);
-                    CACHE.put(id, m);
-                    Logger.info("Model loaded from JAR: " + name);
-                    return m;
+                    if (m.load(is)) {
+                        CACHE.put(id, m);
+                        Logger.info("Model loaded from JAR: " + name);
+                        return m;
+                    }
+                    Logger.error("Bad v5 model resource " + name + ", falling back to disk.");
                 } else {
                     try (ObjectInputStream ois = new ObjectInputStream(is)) {
                         Millennium m = (Millennium) ois.readObject();
