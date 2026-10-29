@@ -2,6 +2,8 @@ package kireiko.dev.anticheat.api.data;
 
 import kireiko.dev.anticheat.api.player.PlayerProfile;
 import kireiko.dev.anticheat.core.AsyncScheduler;
+import kireiko.dev.anticheat.services.AnimatedPunishService;
+import kireiko.dev.anticheat.services.SimulationFlagService;
 import kireiko.dev.anticheat.utils.LogUtils;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -35,7 +37,12 @@ public final class PlayerContainer {
                     // Only publish if this init was not cancelled by unload()/a newer login
                     // and the player is still online.
                     if (pendingInits.remove(uuid, token) && player.isOnline()) {
-                        uuidPlayerProfileMap.put(uuid, profile);
+                        uuidPlayerProfileMap.compute(uuid, (id, previous) -> {
+                            if (previous != null && previous != profile) previous.invalidate();
+                            return profile;
+                        });
+                    } else {
+                        profile.invalidate();
                     }
                 }
             } finally {
@@ -52,13 +59,22 @@ public final class PlayerContainer {
             // async task could create a profile for an already-disconnected player
             // that would never be removed.
             pendingInits.remove(uuid);
-            profile = uuidPlayerProfileMap.remove(uuid);
+            final PlayerProfile[] removed = new PlayerProfile[1];
+            uuidPlayerProfileMap.compute(uuid, (id, previous) -> {
+                removed[0] = previous;
+                if (previous != null) previous.invalidate();
+                return null;
+            });
+            profile = removed[0];
+            RotationsContainer.unload(uuid);
         }
         if (profile == null) return;
         saveLogs(profile);
         if (profile.getBanAnimInfo() != null && !profile.isIgnoreExitBan()) {
             profile.forcePunish(profile.getBanAnimInfo().getX(), profile.getBanAnimInfo().getY());
         }
+        AnimatedPunishService.unload(profile);
+        SimulationFlagService.unload(profile);
     }
 
     private static void saveLogs(PlayerProfile profile) {

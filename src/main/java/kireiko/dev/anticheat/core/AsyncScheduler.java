@@ -15,9 +15,14 @@ public final class AsyncScheduler {
 
     private static final char INNER_CLASS_SEPARATOR_CHAR = '$';
     public static int STOP_WATCH_TIME_MILLIS = 1500;
+    private static final int WORKER_THREADS =
+            Math.max(2, Math.min(4, Runtime.getRuntime().availableProcessors()));
     @Getter
-    private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(30,
+    private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(WORKER_THREADS,
             new ThreadFactoryBuilder().setNameFormat("MX Thread %d").build());
+    @Getter
+    private static final ExecutorService ioExecutor = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat("MX IO Thread").build());
 
     private AsyncScheduler() {
 
@@ -25,6 +30,7 @@ public final class AsyncScheduler {
 
     public static void shutdown() {
         TryIgnore.ignore(() -> scheduler.shutdownNow());
+        TryIgnore.ignore(() -> ioExecutor.shutdownNow());
     }
 
     public static Future<?> run(Runnable runnable) {
@@ -33,6 +39,14 @@ public final class AsyncScheduler {
 
     public static <T> Future<T> run(Callable<T> callable) {
         return scheduler.submit(new DecoratedCallable<>(callable));
+    }
+
+    public static Future<?> runIO(Runnable runnable) {
+        return ioExecutor.submit(new DecoratedRunnable(runnable));
+    }
+
+    public static <T> Future<T> runIO(Callable<T> callable) {
+        return ioExecutor.submit(new DecoratedCallable<>(callable));
     }
 
     public static ScheduledFuture<?> later(Runnable runnable, long delay, TimeUnit time) {

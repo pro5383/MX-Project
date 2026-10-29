@@ -118,7 +118,7 @@ public final class VelocityCheck implements PacketCheckHandler {
         Location from = event.getFrom();
         Location to = event.getTo();
 
-        if (isPointWall(to.clone().add(0, 1, 0), 0.75)) {
+        if (velocity != null && isPointWall(to.clone().add(0, 1, 0), 0.75)) {
             velocity = null;
         }
 

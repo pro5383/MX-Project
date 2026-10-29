@@ -52,6 +52,10 @@ public final class SimulationFlagService {
         ).anyMatch(material -> !material.toString().equals("AIR"));
     }
 
+    public static void unload(PlayerProfile profile) {
+        flags.removeIf(flag -> flag.getProfile() == profile);
+    }
+
     @Data
     @AllArgsConstructor
     public static class Flag {

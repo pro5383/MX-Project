@@ -2,7 +2,6 @@ package kireiko.dev.millennium.ml;
 
 import kireiko.dev.anticheat.MX;
 import kireiko.dev.millennium.ml.logic.*;
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
@@ -42,7 +41,6 @@ public class FactoryML {
         CACHE.remove(id);
     }
 
-    @SneakyThrows
     public static Millennium loadFromFile(int id, String name, int tSize, int sSize, ModelVer ver) {
         File folder = new File(MX.getInstance().getDataFolder(), "models");
         if (!folder.exists()) folder.mkdirs();
@@ -87,7 +85,6 @@ public class FactoryML {
         return m;
     }
 
-    @SneakyThrows
     public static Millennium loadFromResources(int id, String name, int tSize, int sSize, ModelVer ver) {
         String path = "/ml/" + name;
 

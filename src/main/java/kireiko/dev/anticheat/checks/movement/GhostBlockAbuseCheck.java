@@ -11,6 +11,7 @@ import kireiko.dev.anticheat.utils.BlockSnapshot;
 import kireiko.dev.anticheat.utils.ConfigCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.Map;
@@ -53,7 +54,7 @@ public class GhostBlockAbuseCheck implements PacketCheckHandler {
         final Location to = event.getTo().clone();
         final Location from = event.getFrom().clone();
         final boolean onGround = event.getProfile().isGround();
-        final int buffer = Math.max(1, ((Number) localCfg.get("buffer")).intValue());
+        final int buffer = Math.max(2, ((Number) localCfg.get("buffer")).intValue());
         // Block reads are only safe on the main thread.
         MainThread.run(() -> {
             if (!onGround || !profile.getPlayer().isOnline()) return;
@@ -96,6 +97,12 @@ public class GhostBlockAbuseCheck implements PacketCheckHandler {
     private boolean isOnSolidGround(final Location location) {
         final World world = location.getWorld();
         if (world == null) return true;
+        final Material center = world.getBlockAt(
+                location.getBlockX(),
+                (int) Math.floor(location.getY() - 0.1),
+                location.getBlockZ()
+        ).getType();
+        if (isSolid(center)) return true;
         return BlockSnapshot.capture(
                 world,
                 location.getX(),
@@ -104,10 +111,13 @@ public class GhostBlockAbuseCheck implements PacketCheckHandler {
                 0.3,
                 0.5,
                 0.3
-        ).anyMatch(material ->
-                !material.toString().contains("AIR")
-                        || material.isSolid()
-                        || ignore(material.toString().toLowerCase()));
+        ).anyMatch(this::isSolid);
+    }
+
+    private boolean isSolid(final Material material) {
+        if (material == null) return false;
+        final String name = material.toString().toLowerCase();
+        return !name.contains("air") || material.isSolid() || ignore(name);
     }
 
     private static boolean ignore(String block) {

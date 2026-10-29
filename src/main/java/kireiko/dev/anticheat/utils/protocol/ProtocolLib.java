@@ -9,8 +9,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class ProtocolLib {
 
@@ -42,7 +42,7 @@ public final class ProtocolLib {
     public static int getEntityID(Entity entity) {
         if (entity instanceof Player) {
             if (ProtocolLib.isTemporary((Player) entity)) {
-                return new Random().nextInt();
+                return ThreadLocalRandom.current().nextInt();
             } else {
                 return entity.getEntityId();
             }
