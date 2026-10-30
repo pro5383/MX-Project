@@ -74,7 +74,6 @@ public final class VelocityCheck implements PacketCheckHandler {
         if (o instanceof SVelocityEvent) {
             final SVelocityEvent event = (SVelocityEvent) o;
             final Location from = profile.getTo().clone();
-            // Block reads and the state they drive must happen on the main thread.
             MainThread.run(() -> {
                 this.totalVlAtY = 25;
                 this.from = from;

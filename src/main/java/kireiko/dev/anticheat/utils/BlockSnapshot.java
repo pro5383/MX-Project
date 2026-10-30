@@ -6,14 +6,6 @@ import org.bukkit.World;
 
 import java.util.function.Predicate;
 
-/**
- * Immutable 3x3x3 snapshot of block materials around a point.
- * <p>
- * Must be captured on the main thread. Checks running on netty threads can
- * then inspect the already-read {@link Material} values without touching the
- * world themselves (which would race with chunk unloads and Paper's
- * async-access checks).
- */
 public final class BlockSnapshot {
 
     private static final int SIZE = 3;

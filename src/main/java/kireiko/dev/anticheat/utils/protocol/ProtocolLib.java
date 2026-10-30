@@ -1,7 +1,6 @@
 package kireiko.dev.anticheat.utils.protocol;
 
 import com.comphenix.protocol.injector.temporary.TemporaryPlayer;
-import kireiko.dev.anticheat.utils.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -16,12 +15,6 @@ public final class ProtocolLib {
 
     private static boolean
             temporaryClass = false;
-
-    private static void checkClass() {
-        temporaryClass = ReflectionUtils.classExists(
-                "com.comphenix.protocol.injector.temporary.TemporaryPlayer"
-        );
-    }
 
     public static boolean isTemporary(OfflinePlayer player) {
         return temporaryClass && player instanceof TemporaryPlayer;

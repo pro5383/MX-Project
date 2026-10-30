@@ -131,13 +131,6 @@ public final class AnimatedPunishService {
         Bukkit.getScheduler().runTask(MX.getInstance(), () -> w.spawnParticle(p, l, c));
     }
 
-    private static void p2(World w, Location l, Particle p) {
-        // thread-safe
-        Bukkit.getScheduler().runTask(MX.getInstance(),
-                () -> w.spawnParticle(p, l, 1, 0, 0, 0, 0));
-    }
-
-
     // interpolation
     private static double circOut(double from, double to, int percent) {
         percent = Math.max(0, Math.min(100, percent));

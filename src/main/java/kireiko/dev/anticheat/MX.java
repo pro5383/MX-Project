@@ -84,7 +84,6 @@ public class MX extends JavaPlugin {
         AnimatedPunishService.init();
         FunThingsService.init();
         SimulationFlagService.init();
-        //CrasherShieldNewListener.watchdog();
 
         // reset vl
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
@@ -99,7 +98,6 @@ public class MX extends JavaPlugin {
     }
 
     private void loadListeners() {
-        //Bukkit.getPluginManager().registerEvents(new GhostBlockTest(), this);
         Bukkit.getPluginManager().registerEvents(new InteractSpellListener(), this);
         Bukkit.getPluginManager().registerEvents(new JoinQuitListener(), this);
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();

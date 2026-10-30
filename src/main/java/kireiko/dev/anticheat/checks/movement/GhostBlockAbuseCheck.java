@@ -55,7 +55,6 @@ public class GhostBlockAbuseCheck implements PacketCheckHandler {
         final Location from = event.getFrom().clone();
         final boolean onGround = event.getProfile().isGround();
         final int buffer = Math.max(2, ((Number) localCfg.get("buffer")).intValue());
-        // Block reads are only safe on the main thread.
         MainThread.run(() -> {
             if (!onGround || !profile.getPlayer().isOnline()) return;
             final boolean flag = !(isOnSolidGround(to) || isOnSolidGround(from));
@@ -63,8 +62,6 @@ public class GhostBlockAbuseCheck implements PacketCheckHandler {
                 this.flags++;
                 profile.debug("&7GhostBlock flags: " + this.flags + "/" + buffer);
                 if (this.buffLoc == null) {
-                    // First flag (or buffer <= 1): fall back to the position before
-                    // the invalid move instead of dereferencing null.
                     this.buffLoc = from.clone();
                     this.buffLoc.setWorld(profile.getPlayer().getWorld());
                 }

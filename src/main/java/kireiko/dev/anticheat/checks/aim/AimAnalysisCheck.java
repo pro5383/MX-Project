@@ -5,7 +5,6 @@ import kireiko.dev.anticheat.api.data.ConfigLabel;
 import kireiko.dev.anticheat.api.events.RotationEvent;
 import kireiko.dev.anticheat.api.events.UseEntityEvent;
 import kireiko.dev.anticheat.api.player.PlayerProfile;
-import kireiko.dev.anticheat.api.player.SensitivityProcessor;
 import kireiko.dev.anticheat.managers.CheckManager;
 import kireiko.dev.millennium.math.Statistics;
 import kireiko.dev.millennium.types.ConcurrentEvictingList;
@@ -183,8 +182,4 @@ public final class AimAnalysisCheck implements PacketCheckHandler {
         this.buffer.set(index, (r < 0) ? 0 : r);
     }
 
-    private void mulBuffer(int index, float v) {
-        float r = this.buffer.get(index) * v;
-        this.buffer.set(index, (r < 0) ? 0 : r);
-    }
 }

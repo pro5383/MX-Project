@@ -19,10 +19,7 @@ public final class PlayerContainer {
 
     @Getter
     private static final Map<UUID, PlayerProfile> uuidPlayerProfileMap = new ConcurrentHashMap<>();
-    /**
-     * Tracks profile initializations that have not finished yet. The value is a
-     * per-init token, so a rejoin invalidates an older still-running task.
-     */
+
     private static final Map<UUID, Object> pendingInits = new ConcurrentHashMap<>();
 
     public static void init(Player player) {
@@ -34,8 +31,6 @@ public final class PlayerContainer {
                 PlayerProfile profile = new PlayerProfile(player);
                 profile.initChecks(profile.getInstance());
                 synchronized (INIT_LOCK) {
-                    // Only publish if this init was not cancelled by unload()/a newer login
-                    // and the player is still online.
                     if (pendingInits.remove(uuid, token) && player.isOnline()) {
                         uuidPlayerProfileMap.compute(uuid, (id, previous) -> {
                             if (previous != null && previous != profile) previous.invalidate();
@@ -55,9 +50,6 @@ public final class PlayerContainer {
         final UUID uuid = player.getUniqueId();
         final PlayerProfile profile;
         synchronized (INIT_LOCK) {
-            // Cancel an init that has not published its profile yet; otherwise the
-            // async task could create a profile for an already-disconnected player
-            // that would never be removed.
             pendingInits.remove(uuid);
             final PlayerProfile[] removed = new PlayerProfile[1];
             uuidPlayerProfileMap.compute(uuid, (id, previous) -> {

@@ -7,11 +7,6 @@ import java.io.IOException;
 public final class ModelIO {
     public static final int MAGIC = 0xDEAD0003;
     public static final int VERSION = 4;
-    /**
-     * Upper bound for arrays read from a model file (16M doubles = 128 MiB).
-     * Prevents a corrupted/hostile file from requesting an allocation that
-     * exhausts the heap before the actual element count is known.
-     */
     public static final int MAX_ARRAY_LENGTH = 1 << 24;
 
     public static void writeArr(DataOutputStream out, double[] a) throws IOException {
